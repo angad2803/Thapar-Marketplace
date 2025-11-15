@@ -4,14 +4,21 @@ const {
   getAllUsers,
   getUserDetails,
   updateUserStatus,
+  updateUserRole,
+  updateUserBadges,
   deleteUser,
+  bulkBanUsers,
   getAllListings,
   deleteListing,
+  bulkDeleteListings,
+  getAllReviews,
+  deleteReview,
   createAnnouncement,
   getAllAnnouncements,
   updateAnnouncement,
   deleteAnnouncement,
   getDashboardStats,
+  getPlatformAnalytics,
 } = require("../controllers/adminController");
 const { protect, authorize } = require("../middleware/authMiddleware");
 const { mongoIdValidation, validate } = require("../middleware/validation");
@@ -22,16 +29,25 @@ router.use(authorize("admin"));
 
 // Dashboard
 router.get("/stats", getDashboardStats);
+router.get("/analytics", getPlatformAnalytics);
 
 // User management
 router.get("/users", getAllUsers);
 router.get("/users/:id", mongoIdValidation, validate, getUserDetails);
 router.put("/users/:id/status", mongoIdValidation, validate, updateUserStatus);
+router.put("/users/:id/role", mongoIdValidation, validate, updateUserRole);
+router.put("/users/:id/badges", mongoIdValidation, validate, updateUserBadges);
 router.delete("/users/:id", mongoIdValidation, validate, deleteUser);
+router.post("/users/bulk-ban", bulkBanUsers);
 
 // Listing management
 router.get("/listings", getAllListings);
 router.delete("/listings/:id", mongoIdValidation, validate, deleteListing);
+router.post("/listings/bulk-delete", bulkDeleteListings);
+
+// Review management
+router.get("/reviews", getAllReviews);
+router.delete("/reviews/:id", mongoIdValidation, validate, deleteReview);
 
 // Announcement management
 router

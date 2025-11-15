@@ -74,6 +74,16 @@ const userSchema = new mongoose.Schema(
       trim: true,
       default: null,
     },
+    upiId: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+    publicKey: {
+      type: String,
+      default: null,
+      select: false,
+    },
     profileCompleted: {
       type: Boolean,
       default: false,
@@ -99,6 +109,67 @@ const userSchema = new mongoose.Schema(
         ref: "Listing",
       },
     ],
+    // Rating & Reviews
+    averageRating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5,
+    },
+    totalReviews: {
+      type: Number,
+      default: 0,
+    },
+    // Follow System
+    followers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    following: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    // Badges & Trust
+    badges: {
+      verified: {
+        type: Boolean,
+        default: false,
+      },
+      trustedSeller: {
+        type: Boolean,
+        default: false,
+      },
+      quickResponder: {
+        type: Boolean,
+        default: false,
+      },
+      topRated: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    stats: {
+      totalSales: {
+        type: Number,
+        default: 0,
+      },
+      totalPurchases: {
+        type: Number,
+        default: 0,
+      },
+      responseRate: {
+        type: Number,
+        default: 0,
+      },
+      avgResponseTime: {
+        type: Number,
+        default: 0,
+      },
+    },
     isActive: {
       type: Boolean,
       default: true,

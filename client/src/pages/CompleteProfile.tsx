@@ -29,6 +29,7 @@ const CompleteProfile = () => {
     hostel: "",
     roomNumber: "",
     phoneNumber: "",
+    upiId: "",
   });
 
   const hostels = [
@@ -70,7 +71,12 @@ const CompleteProfile = () => {
       const token = localStorage.getItem("token");
 
       // Only send non-empty fields
-      const payload: { hostel: string; roomNumber?: string; phoneNumber?: string } = {
+      const payload: {
+        hostel: string;
+        roomNumber?: string;
+        phoneNumber?: string;
+        upiId?: string;
+      } = {
         hostel: formData.hostel,
       };
 
@@ -80,6 +86,10 @@ const CompleteProfile = () => {
 
       if (formData.phoneNumber?.trim()) {
         payload.phoneNumber = formData.phoneNumber.trim();
+      }
+
+      if (formData.upiId?.trim()) {
+        payload.upiId = formData.upiId.trim();
       }
 
       console.log("Sending payload:", payload); // Debug log
@@ -108,10 +118,15 @@ const CompleteProfile = () => {
         navigate("/dashboard");
       } else {
         // Show detailed error if available
-        const errorMessage = data.errors 
-          ? data.errors.map((e: { field: string; message: string }) => `${e.field}: ${e.message}`).join(", ")
+        const errorMessage = data.errors
+          ? data.errors
+              .map(
+                (e: { field: string; message: string }) =>
+                  `${e.field}: ${e.message}`
+              )
+              .join(", ")
           : data.message || "Failed to complete profile";
-        
+
         toast({
           title: "Error",
           description: errorMessage,
@@ -200,6 +215,22 @@ const CompleteProfile = () => {
                     setFormData({ ...formData, phoneNumber: e.target.value })
                   }
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="upiId">UPI ID (Optional)</Label>
+                <Input
+                  id="upiId"
+                  type="text"
+                  placeholder="e.g., yourname@paytm"
+                  value={formData.upiId}
+                  onChange={(e) =>
+                    setFormData({ ...formData, upiId: e.target.value })
+                  }
+                />
+                <p className="text-xs text-muted-foreground">
+                  Add your UPI ID to receive payments when you sell items
+                </p>
               </div>
 
               <Button

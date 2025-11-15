@@ -27,10 +27,12 @@ const io = new Server(server, {
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:8080",
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || "http://localhost:8080",
+    credentials: true,
+  })
+);
 
 // Database connection
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/ziddi";
@@ -43,7 +45,7 @@ mongoose
 initializeChatSocket(io);
 
 // Make io accessible to routes
-app.set('io', io);
+app.set("io", io);
 
 // Routes
 app.use("/api/auth", authRoutes);

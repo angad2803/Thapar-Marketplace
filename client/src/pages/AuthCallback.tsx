@@ -1,24 +1,34 @@
-import { useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import EncryptionSetup from "@/components/EncryptionSetup";
 
 const AuthCallback = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [showEncryptionSetup, setShowEncryptionSetup] = useState(false);
 
   useEffect(() => {
-    const token = searchParams.get('token');
-    
+    const token = searchParams.get("token");
+
     if (token) {
       // Store token in localStorage
-      localStorage.setItem('token', token);
-      
-      // Redirect to dashboard
-      navigate('/dashboard');
+      localStorage.setItem("token", token);
+
+      // Show encryption setup before redirecting
+      setShowEncryptionSetup(true);
     } else {
       // No token, redirect to login with error
-      navigate('/login?error=authentication_failed');
+      navigate("/login?error=authentication_failed");
     }
   }, [searchParams, navigate]);
+
+  const handleEncryptionComplete = () => {
+    navigate("/dashboard");
+  };
+
+  if (showEncryptionSetup) {
+    return <EncryptionSetup onComplete={handleEncryptionComplete} />;
+  }
 
   return (
     <div className="min-h-screen bg-secondary flex items-center justify-center">

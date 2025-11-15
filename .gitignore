@@ -5,6 +5,7 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 bun.lockb
+package-lock.json
 
 # Environment variables
 .env
@@ -13,6 +14,7 @@ bun.lockb
 .env.test.local
 .env.production.local
 server/.env
+client/.env
 
 # Build outputs
 dist/
@@ -37,6 +39,24 @@ Thumbs.db
 coverage/
 .nyc_output/
 
+# Uploads
+server/uploads/*
+!server/uploads/.gitkeep
+
+# Temporary/backup files
+backend/
+src/
+
+# Extra documentation
+**/DEVELOPMENT.md
+**/REFACTORING_SUMMARY.md
+**/API_DOCUMENTATION.md
+**/GOOGLE_*.md
+**/PROJECT_COMPLETE.md
+**/SETUP_GUIDE.md
+**/WEBSOCKET_SETUP.md
+
 # Misc
 *.tsbuildinfo
 .cache/
+.turbo/

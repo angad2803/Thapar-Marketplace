@@ -248,8 +248,8 @@ exports.googleCallback = async (req, res, next) => {
     const profileCompleted = req.user.profileCompleted;
 
     // Redirect to frontend with token and profile status
-    const frontendURL = process.env.FRONTEND_URL || 'http://localhost:8080';
-    
+    const frontendURL = process.env.FRONTEND_URL || "http://localhost:8080";
+
     if (!profileCompleted) {
       // Redirect to complete profile page
       res.redirect(`${frontendURL}/complete-profile?token=${token}`);
@@ -269,7 +269,7 @@ exports.googleCallback = async (req, res, next) => {
  */
 exports.completeProfile = async (req, res, next) => {
   try {
-    const { hostel, roomNumber, phoneNumber } = req.body;
+    const { hostel, roomNumber, phoneNumber, upiId } = req.body;
 
     if (!hostel) {
       return res.status(400).json({
@@ -291,6 +291,7 @@ exports.completeProfile = async (req, res, next) => {
     user.hostel = hostel;
     user.roomNumber = roomNumber || null;
     user.phoneNumber = phoneNumber || user.phoneNumber;
+    user.upiId = upiId || user.upiId;
     user.profileCompleted = true;
 
     await user.save();
@@ -306,8 +307,76 @@ exports.completeProfile = async (req, res, next) => {
           hostel: user.hostel,
           roomNumber: user.roomNumber,
           phoneNumber: user.phoneNumber,
+          upiId: user.upiId,
           profileCompleted: user.profileCompleted,
         },
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Update user's public key for E2EE
+ * @route   PUT /api/auth/public-key
+ * @access  Private
+ */
+exports.updatePublicKey = async (req, res, next) => {
+  try {
+    const { publicKey } = req.body;
+
+    if (!publicKey) {
+      return res.status(400).json({
+        success: false,
+        message: "Public key is required",
+      });
+    }
+
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    user.publicKey = publicKey;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Public key updated successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Get user's public key
+ * @route   GET /api/auth/public-key/:userId
+ * @access  Private
+ */
+exports.getPublicKey = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.userId).select(
+      "publicKey name"
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        publicKey: user.publicKey,
+        name: user.name,
       },
     });
   } catch (error) {
@@ -322,8 +391,10 @@ exports.completeProfile = async (req, res, next) => {
  */
 exports.googleFailure = async (req, res, next) => {
   try {
-    const frontendURL = process.env.FRONTEND_URL || 'http://localhost:8080';
-    res.redirect(`${frontendURL}/login?error=Only Thapar University emails are allowed`);
+    const frontendURL = process.env.FRONTEND_URL || "http://localhost:8080";
+    res.redirect(
+      `${frontendURL}/login?error=Only Thapar University emails are allowed`
+    );
   } catch (error) {
     next(error);
   }

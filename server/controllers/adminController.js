@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Listing = require("../models/Listing");
 const Report = require("../models/Report");
+const Review = require("../models/Review");
 const Transaction = require("../models/Transaction");
 const Announcement = require("../models/Announcement");
 
@@ -349,18 +350,52 @@ exports.getDashboardStats = async (req, res, next) => {
     const activeListings = await Listing.countDocuments({
       status: "available",
     });
-    const totalTransactions = await Transaction.countDocuments();
+    const soldListings = await Listing.countDocuments({ status: "sold" });
+    const totalReviews = await Review.countDocuments();
     const pendingReports = await Report.countDocuments({ status: "pending" });
+
+    // Top rated users
+    const topRatedUsers = await User.find({ totalReviews: { $gte: 1 } })
+      .sort("-averageRating -totalReviews")
+      .limit(5)
+      .select("name email averageRating totalReviews profileImage badges");
+
+    // Top sellers
+    const topSellers = await User.find({ "stats.totalSales": { $gte: 1 } })
+      .sort("-stats.totalSales")
+      .limit(5)
+      .select("name email stats.totalSales averageRating profileImage");
 
     // Recent activity
     const recentUsers = await User.find()
       .sort("-createdAt")
       .limit(5)
-      .select("name email createdAt");
+      .select("name email createdAt hostel");
+
     const recentListings = await Listing.find()
       .sort("-createdAt")
       .limit(5)
       .populate("sellerId", "name email");
+
+    const recentReviews = await Review.find()
+      .sort("-createdAt")
+      .limit(5)
+      .populate("reviewer", "name profileImage")
+      .populate("reviewedUser", "name profileImage")
+      .populate("listing", "title");
+
+    // Category distribution
+    const categoryStats = await Listing.aggregate([
+      { $group: { _id: "$category", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+    ]);
+
+    // Hostel distribution
+    const hostelStats = await User.aggregate([
+      { $match: { hostel: { $ne: null } } },
+      { $group: { _id: "$hostel", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+    ]);
 
     res.status(200).json({
       success: true,
@@ -370,12 +405,357 @@ exports.getDashboardStats = async (req, res, next) => {
           activeUsers,
           totalListings,
           activeListings,
-          totalTransactions,
+          soldListings,
+          totalReviews,
           pendingReports,
+        },
+        topUsers: {
+          topRated: topRatedUsers,
+          topSellers: topSellers,
         },
         recentActivity: {
           users: recentUsers,
           listings: recentListings,
+          reviews: recentReviews,
+        },
+        distributions: {
+          categories: categoryStats,
+          hostels: hostelStats,
+        },
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Update user role
+ * @route   PUT /api/admin/users/:id/role
+ * @access  Private/Admin
+ */
+exports.updateUserRole = async (req, res, next) => {
+  try {
+    const { role } = req.body;
+
+    if (!["user", "admin"].includes(role)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid role",
+      });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { role },
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `User role updated to ${role}`,
+      data: user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Update user badges
+ * @route   PUT /api/admin/users/:id/badges
+ * @access  Private/Admin
+ */
+exports.updateUserBadges = async (req, res, next) => {
+  try {
+    const { verified, trustedSeller, quickResponder, topRated } = req.body;
+
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    if (verified !== undefined) user.badges.verified = verified;
+    if (trustedSeller !== undefined) user.badges.trustedSeller = trustedSeller;
+    if (quickResponder !== undefined)
+      user.badges.quickResponder = quickResponder;
+    if (topRated !== undefined) user.badges.topRated = topRated;
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "User badges updated successfully",
+      data: user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Get all reviews (admin)
+ * @route   GET /api/admin/reviews
+ * @access  Private/Admin
+ */
+exports.getAllReviews = async (req, res, next) => {
+  try {
+    const { page = 1, limit = 20, rating } = req.query;
+
+    const query = {};
+    if (rating) {
+      query.rating = Number(rating);
+    }
+
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const reviews = await Review.find(query)
+      .populate("reviewer", "name email profileImage")
+      .populate("reviewedUser", "name email profileImage")
+      .populate("listing", "title images")
+      .sort("-createdAt")
+      .skip(skip)
+      .limit(Number(limit));
+
+    const total = await Review.countDocuments(query);
+
+    // Review stats
+    const avgRating = await Review.aggregate([
+      { $group: { _id: null, average: { $avg: "$rating" } } },
+    ]);
+
+    const ratingDistribution = await Review.aggregate([
+      { $group: { _id: "$rating", count: { $sum: 1 } } },
+      { $sort: { _id: 1 } },
+    ]);
+
+    res.status(200).json({
+      success: true,
+      count: reviews.length,
+      total,
+      page: Number(page),
+      pages: Math.ceil(total / Number(limit)),
+      stats: {
+        averageRating: avgRating[0]?.average || 0,
+        distribution: ratingDistribution,
+      },
+      data: reviews,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Delete review (admin)
+ * @route   DELETE /api/admin/reviews/:id
+ * @access  Private/Admin
+ */
+exports.deleteReview = async (req, res, next) => {
+  try {
+    const review = await Review.findById(req.params.id);
+
+    if (!review) {
+      return res.status(404).json({
+        success: false,
+        message: "Review not found",
+      });
+    }
+
+    const reviewedUserId = review.reviewedUser;
+    await review.deleteOne();
+
+    // Recalculate average rating
+    await Review.calculateAverageRating(reviewedUserId);
+
+    res.status(200).json({
+      success: true,
+      message: "Review deleted successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Bulk delete listings
+ * @route   POST /api/admin/listings/bulk-delete
+ * @access  Private/Admin
+ */
+exports.bulkDeleteListings = async (req, res, next) => {
+  try {
+    const { listingIds } = req.body;
+
+    if (!Array.isArray(listingIds) || listingIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide an array of listing IDs",
+      });
+    }
+
+    const result = await Listing.deleteMany({ _id: { $in: listingIds } });
+
+    res.status(200).json({
+      success: true,
+      message: `${result.deletedCount} listings deleted successfully`,
+      deletedCount: result.deletedCount,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Bulk ban users
+ * @route   POST /api/admin/users/bulk-ban
+ * @access  Private/Admin
+ */
+exports.bulkBanUsers = async (req, res, next) => {
+  try {
+    const { userIds } = req.body;
+
+    if (!Array.isArray(userIds) || userIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide an array of user IDs",
+      });
+    }
+
+    // Don't ban admin users
+    const result = await User.updateMany(
+      { _id: { $in: userIds }, role: { $ne: "admin" } },
+      { isActive: false }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `${result.modifiedCount} users banned successfully`,
+      bannedCount: result.modifiedCount,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Get platform analytics
+ * @route   GET /api/admin/analytics
+ * @access  Private/Admin
+ */
+exports.getPlatformAnalytics = async (req, res, next) => {
+  try {
+    const { timeframe = "week" } = req.query;
+
+    // Calculate date range
+    const now = new Date();
+    let startDate;
+
+    switch (timeframe) {
+      case "day":
+        startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        break;
+      case "week":
+        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        break;
+      case "month":
+        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        break;
+      case "year":
+        startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+        break;
+      default:
+        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    }
+
+    // New users over time
+    const newUsers = await User.countDocuments({
+      createdAt: { $gte: startDate },
+    });
+
+    // New listings over time
+    const newListings = await Listing.countDocuments({
+      createdAt: { $gte: startDate },
+    });
+
+    // Listings sold
+    const listingsSold = await Listing.countDocuments({
+      status: "sold",
+      updatedAt: { $gte: startDate },
+    });
+
+    // New reviews
+    const newReviews = await Review.countDocuments({
+      createdAt: { $gte: startDate },
+    });
+
+    // Most active users (by listings posted)
+    const mostActiveUsers = await Listing.aggregate([
+      { $match: { createdAt: { $gte: startDate } } },
+      { $group: { _id: "$sellerId", listingsPosted: { $sum: 1 } } },
+      { $sort: { listingsPosted: -1 } },
+      { $limit: 10 },
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      { $unwind: "$user" },
+      {
+        $project: {
+          name: "$user.name",
+          email: "$user.email",
+          profileImage: "$user.profileImage",
+          listingsPosted: 1,
+        },
+      },
+    ]);
+
+    // Popular categories
+    const popularCategories = await Listing.aggregate([
+      { $match: { createdAt: { $gte: startDate } } },
+      { $group: { _id: "$category", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+    ]);
+
+    // Engagement metrics
+    const totalViews = await Listing.aggregate([
+      { $group: { _id: null, totalViews: { $sum: "$views" } } },
+    ]);
+
+    const totalWishlists = await Listing.aggregate([
+      { $project: { wishlistCount: { $size: "$wishlistedBy" } } },
+      { $group: { _id: null, total: { $sum: "$wishlistCount" } } },
+    ]);
+
+    res.status(200).json({
+      success: true,
+      timeframe,
+      data: {
+        growth: {
+          newUsers,
+          newListings,
+          listingsSold,
+          newReviews,
+        },
+        mostActiveUsers,
+        popularCategories,
+        engagement: {
+          totalViews: totalViews[0]?.totalViews || 0,
+          totalWishlists: totalWishlists[0]?.total || 0,
         },
       },
     });

@@ -1,5 +1,6 @@
 const Listing = require("../models/Listing");
 const User = require("../models/User");
+const { calculateProximityScore } = require("../utils/hostelProximity");
 
 /**
  * @desc    Get all listings with filters and pagination
@@ -15,6 +16,8 @@ exports.getListings = async (req, res, next) => {
       maxPrice,
       search,
       status = "available",
+      hostel,
+      myHostelOnly,
       sort = "-createdAt",
       page = 1,
       limit = 20,
@@ -41,14 +44,45 @@ exports.getListings = async (req, res, next) => {
       query.$text = { $search: search };
     }
 
+    // Hostel-based filtering
+    if (hostel) {
+      query.sellerHostel = hostel;
+    }
+
+    // Get user's hostel for proximity sorting
+    let userHostel = null;
+    if (req.user) {
+      const user = await User.findById(req.user.id).select("hostel");
+      userHostel = user?.hostel;
+
+      // Filter by user's hostel only
+      if (myHostelOnly === "true" && userHostel) {
+        query.sellerHostel = userHostel;
+      }
+    }
+
     // Execute query with pagination
     const skip = (Number(page) - 1) * Number(limit);
 
-    const listings = await Listing.find(query)
-      .populate("sellerId", "name email university profileImage")
+    let listings = await Listing.find(query)
+      .populate("sellerId", "name email university profileImage hostel")
       .sort(sort)
       .skip(skip)
       .limit(Number(limit));
+
+    // Sort by hostel proximity if user is logged in
+    if (userHostel && sort === "-createdAt") {
+      listings = listings.sort((a, b) => {
+        const scoreA = calculateProximityScore(userHostel, a.sellerHostel);
+        const scoreB = calculateProximityScore(userHostel, b.sellerHostel);
+
+        // If scores are different, sort by proximity
+        if (scoreA !== scoreB) return scoreB - scoreA;
+
+        // If same proximity, sort by date
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      });
+    }
 
     const total = await Listing.countDocuments(query);
 
@@ -59,6 +93,7 @@ exports.getListings = async (req, res, next) => {
       page: Number(page),
       pages: Math.ceil(total / Number(limit)),
       data: listings,
+      userHostel: userHostel, // Send user's hostel for frontend use
     });
   } catch (error) {
     next(error);
@@ -125,6 +160,10 @@ exports.createListing = async (req, res, next) => {
       });
     }
 
+    // Get seller's hostel information
+    const seller = await User.findById(req.user.id).select("hostel");
+    const sellerHostel = seller?.hostel || null;
+
     const listing = await Listing.create({
       title,
       description,
@@ -136,6 +175,7 @@ exports.createListing = async (req, res, next) => {
       tags,
       images,
       sellerId: req.user.id,
+      sellerHostel,
     });
 
     const populatedListing = await Listing.findById(listing._id).populate(
@@ -184,6 +224,20 @@ exports.updateListing = async (req, res, next) => {
     if (req.files && req.files.length > 0) {
       const newImages = req.files.map((file) => `/uploads/${file.filename}`);
       req.body.images = [...(listing.images || []), ...newImages];
+    }
+
+    // Update seller stats if status changed to sold
+    if (req.body.status === "sold" && listing.status !== "sold") {
+      await User.findByIdAndUpdate(listing.sellerId, {
+        $inc: { "stats.totalSales": 1 },
+      });
+
+      // Check and update badges
+      const seller = await User.findById(listing.sellerId);
+      if (seller.stats.totalSales >= 5 && seller.averageRating >= 4.0) {
+        seller.badges.trustedSeller = true;
+        await seller.save();
+      }
     }
 
     listing = await Listing.findByIdAndUpdate(req.params.id, req.body, {

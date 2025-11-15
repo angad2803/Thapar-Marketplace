@@ -301,7 +301,7 @@ exports.completeProfileValidation = [
       "Vahni Hall (Hostel-Q)",
       "Hostel-FRF/G",
       "Day Scholar",
-      "Off Campus"
+      "Off Campus",
     ])
     .withMessage("Please select a valid hostel"),
 

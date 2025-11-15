@@ -33,7 +33,9 @@ exports.getConversations = async (req, res, next) => {
               $cond: [
                 {
                   $and: [
-                    { $eq: ["$receiverId", new mongoose.Types.ObjectId(userId)] },
+                    {
+                      $eq: ["$receiverId", new mongoose.Types.ObjectId(userId)],
+                    },
                     { $eq: ["$isRead", false] },
                   ],
                 },
@@ -90,8 +92,8 @@ exports.getMessages = async (req, res, next) => {
     // Get messages
     const messages = await Message.find({ conversationId })
       .sort("createdAt")
-      .populate("senderId", "name email profileImage")
-      .populate("receiverId", "name email profileImage")
+      .populate("senderId", "name email profileImage publicKey")
+      .populate("receiverId", "name email profileImage publicKey")
       .populate("listingId", "title price images");
 
     // Mark unread messages as read
@@ -124,7 +126,7 @@ exports.getMessages = async (req, res, next) => {
  */
 exports.sendMessage = async (req, res, next) => {
   try {
-    const { receiverId, content, listingId } = req.body;
+    const { receiverId, content, listingId, isEncrypted } = req.body;
     const senderId = req.user.id;
 
     // Check if receiver exists
@@ -146,11 +148,12 @@ exports.sendMessage = async (req, res, next) => {
       receiverId,
       content,
       listingId,
+      isEncrypted: isEncrypted || false,
     });
 
     const populatedMessage = await Message.findById(message._id)
-      .populate("senderId", "name email profileImage")
-      .populate("receiverId", "name email profileImage")
+      .populate("senderId", "name email profileImage publicKey")
+      .populate("receiverId", "name email profileImage publicKey")
       .populate("listingId", "title price images");
 
     res.status(201).json({
