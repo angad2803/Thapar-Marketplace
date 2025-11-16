@@ -23,7 +23,11 @@ export default function AdminLogs() {
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
   const [total, setTotal] = useState(0);
-  const [filters, setFilters] = useState({ admin: "", action: "", targetType: "" });
+  const [filters, setFilters] = useState({
+    admin: "",
+    action: "",
+    targetType: "",
+  });
 
   useEffect(() => {
     fetchLogs();
@@ -56,17 +60,21 @@ export default function AdminLogs() {
         <Input
           placeholder="Filter by Admin ID"
           value={filters.admin}
-          onChange={e => setFilters(f => ({ ...f, admin: e.target.value }))}
+          onChange={(e) => setFilters((f) => ({ ...f, admin: e.target.value }))}
         />
         <Input
           placeholder="Filter by Action"
           value={filters.action}
-          onChange={e => setFilters(f => ({ ...f, action: e.target.value }))}
+          onChange={(e) =>
+            setFilters((f) => ({ ...f, action: e.target.value }))
+          }
         />
         <Input
           placeholder="Filter by Target Type"
           value={filters.targetType}
-          onChange={e => setFilters(f => ({ ...f, targetType: e.target.value }))}
+          onChange={(e) =>
+            setFilters((f) => ({ ...f, targetType: e.target.value }))
+          }
         />
       </div>
       <Table>
@@ -84,25 +92,35 @@ export default function AdminLogs() {
         <Tbody>
           {loading ? (
             <Tr>
-              <Td colSpan={7} className="text-center">Loading...</Td>
+              <Td colSpan={7} className="text-center">
+                Loading...
+              </Td>
             </Tr>
           ) : logs.length === 0 ? (
             <Tr>
-              <Td colSpan={7} className="text-center">No logs found.</Td>
+              <Td colSpan={7} className="text-center">
+                No logs found.
+              </Td>
             </Tr>
           ) : (
-            logs.map(log => (
+            logs.map((log) => (
               <Tr key={log._id}>
                 <Td>
                   <div className="flex flex-col">
                     <span className="font-semibold">{log.adminId?.name}</span>
-                    <span className="text-xs text-muted-foreground">{log.adminId?.email}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {log.adminId?.email}
+                    </span>
                   </div>
                 </Td>
-                <Td><Badge>{log.action}</Badge></Td>
+                <Td>
+                  <Badge>{log.action}</Badge>
+                </Td>
                 <Td>{log.targetType}</Td>
                 <Td>{log.targetId || "-"}</Td>
-                <Td className="max-w-xs truncate" title={log.details}>{log.details || "-"}</Td>
+                <Td className="max-w-xs truncate" title={log.details}>
+                  {log.details || "-"}
+                </Td>
                 <Td>{log.ipAddress || "-"}</Td>
                 <Td>{new Date(log.createdAt).toLocaleString()}</Td>
               </Tr>
