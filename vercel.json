@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "buildCommand": "cd client && npm install && npm run vercel-build",
+  "buildCommand": "npm --prefix client install && npm --prefix client run vercel-build",
   "outputDirectory": "client/dist",
-  "installCommand": "cd client && npm install",
+  "installCommand": "npm --prefix client install",
   "framework": null,
   "rewrites": [
     {
