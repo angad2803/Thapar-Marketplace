@@ -5,6 +5,7 @@ import {
   storeKeys,
   hasKeys,
 } from "@/lib/encryption";
+import { API_URL } from "@/config/api";
 import {
   Dialog,
   DialogContent,
@@ -67,7 +68,7 @@ const EncryptionSetup = ({ onComplete }: EncryptionSetupProps) => {
       // Send public key to server
       const token = localStorage.getItem("token");
       const response = await fetch(
-        "http://localhost:3000/api/auth/public-key",
+        `${API_URL}/auth/public-key`,
         {
           method: "PUT",
           headers: {

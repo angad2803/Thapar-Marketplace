@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { API_URL, API_BASE_URL } from "@/config/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Heart, Loader2 } from "lucide-react";
@@ -36,7 +37,7 @@ const Wishlist = () => {
   const loadWishlist = async () => {
     try {
       const response = await fetch(
-        "http://localhost:3000/api/listings/wishlist",
+        `${API_URL}/listings/wishlist`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -61,7 +62,7 @@ const Wishlist = () => {
     setRemovingId(listingId);
     try {
       const response = await fetch(
-        `http://localhost:3000/api/listings/${listingId}/wishlist`,
+        `${API_URL}/listings/${listingId}/wishlist`,
         {
           method: "DELETE",
           headers: {
@@ -139,7 +140,7 @@ const Wishlist = () => {
                     <div className="aspect-video relative bg-gray-200 dark:bg-gray-800">
                       {listing.images && listing.images.length > 0 ? (
                         <img
-                          src={`http://localhost:3000${listing.images[0]}`}
+                          src={`${API_BASE_URL}${listing.images[0]}`}
                           alt={listing.title}
                           className="w-full h-full object-cover"
                         />

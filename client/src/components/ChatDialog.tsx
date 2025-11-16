@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { io, Socket } from "socket.io-client";
+import { API_URL, API_BASE_URL } from "@/config/api";
 import {
   Dialog,
   DialogContent,
@@ -65,7 +66,7 @@ const ChatDialog = ({
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:3000/api/auth/public-key/${recipientId}`,
+        `${API_URL}/auth/public-key/${recipientId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -108,7 +109,7 @@ const ChatDialog = ({
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:3000/api/chat/${recipientId}`,
+        `${API_URL}/chat/${recipientId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -154,7 +155,7 @@ const ChatDialog = ({
     }
 
     // Connect to WebSocket
-    const newSocket = io("http://localhost:3000", {
+    const newSocket = io(API_BASE_URL, {
       auth: { token },
     });
 

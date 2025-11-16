@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
+import { API_URL } from "@/config/api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -37,7 +38,7 @@ const Messages = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        "http://localhost:3000/api/chat/conversations",
+        `${API_URL}/chat/conversations`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

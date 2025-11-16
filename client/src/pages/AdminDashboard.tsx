@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_URL, API_BASE_URL } from "@/config/api";
 import Navbar from "@/components/Navbar";
 import {
   Card,
@@ -108,7 +109,7 @@ const AdminDashboard = () => {
   const checkAdminAccess = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:3000/api/auth/me", {
+      const response = await fetch(`${API_URL}/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
@@ -128,13 +129,13 @@ const AdminDashboard = () => {
       const token = localStorage.getItem("token");
 
       const [statsRes, usersRes, reviewsRes] = await Promise.all([
-        fetch("http://localhost:3000/api/admin/stats", {
+        fetch(`${API_URL}/admin/stats`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        fetch("http://localhost:3000/api/admin/users?limit=10", {
+        fetch(`${API_URL}/admin/users?limit=10`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        fetch("http://localhost:3000/api/admin/reviews?limit=10", {
+        fetch(`${API_URL}/admin/reviews?limit=10`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
@@ -157,7 +158,7 @@ const AdminDashboard = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:3000/api/admin/users/${userId}/status`,
+        `${API_URL}/admin/users/${userId}/status`,
         {
           method: "PUT",
           headers: {
@@ -185,7 +186,7 @@ const AdminDashboard = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:3000/api/admin/users/${userId}/badges`,
+        `${API_URL}/admin/users/${userId}/badges`,
         {
           method: "PUT",
           headers: {
@@ -212,7 +213,7 @@ const AdminDashboard = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:3000/api/admin/reviews/${reviewId}`,
+        `${API_URL}/admin/reviews/${reviewId}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
@@ -533,7 +534,7 @@ const AdminDashboard = () => {
                       });
 
                       const response = await fetch(
-                        "http://localhost:3000/api/lost-found",
+                        `${API_URL}/lost-found`,
                         {
                           method: "POST",
                           headers: {

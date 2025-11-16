@@ -454,7 +454,7 @@ const UserProfile = () => {
                       <div className="relative aspect-square mb-3 rounded-lg overflow-hidden bg-muted">
                         {listing.images && listing.images.length > 0 ? (
                           <img
-                            src={`http://localhost:3000${listing.images[0]}`}
+                            src={`${API_BASE_URL}${listing.images[0]}`}
                             alt={listing.title}
                             className="w-full h-full object-cover"
                           />

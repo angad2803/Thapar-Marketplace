@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { API_URL, API_BASE_URL } from "@/config/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -62,7 +63,7 @@ const LostAndFound = () => {
 
   const loadItems = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/lost-found");
+      const response = await fetch(`${API_URL}/lost-found`);
       const data = await response.json();
 
       if (data.success) {
@@ -206,7 +207,7 @@ const LostAndFound = () => {
                   <div className="aspect-video relative bg-gray-200 dark:bg-gray-800">
                     {item.images && item.images.length > 0 ? (
                       <img
-                        src={`http://localhost:3000${item.images[0]}`}
+                        src={`${API_BASE_URL}${item.images[0]}`}
                         alt={item.itemName}
                         className="w-full h-full object-cover"
                       />

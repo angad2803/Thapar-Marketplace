@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { API_URL, API_BASE_URL } from "@/config/api";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -44,7 +45,7 @@ const ProductDetails = () => {
     const loadListing = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/listings/${id}`,
+          `${API_URL}/listings/${id}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -74,7 +75,7 @@ const ProductDetails = () => {
     const checkWishlistStatus = async () => {
       try {
         const response = await fetch(
-          "http://localhost:3000/api/listings/wishlist",
+          `${API_URL}/listings/wishlist`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -106,7 +107,7 @@ const ProductDetails = () => {
     try {
       const method = isWishlisted ? "DELETE" : "POST";
       const response = await fetch(
-        `http://localhost:3000/api/listings/${id}/wishlist`,
+        `${API_URL}/listings/${id}/wishlist`,
         {
           method,
           headers: {
