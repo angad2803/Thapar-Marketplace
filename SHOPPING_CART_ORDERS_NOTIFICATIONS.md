@@ -7,6 +7,7 @@ Complete implementation of shopping cart, order confirmation workflow, persisten
 ## 🛒 **SHOPPING CART**
 
 ### Features
+
 - Add/remove items from cart
 - Update item quantities
 - View cart with real-time pricing
@@ -16,12 +17,14 @@ Complete implementation of shopping cart, order confirmation workflow, persisten
 ### API Endpoints
 
 #### Get Cart
+
 ```http
 GET /api/cart
 Authorization: Bearer {token}
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -51,6 +54,7 @@ Authorization: Bearer {token}
 ```
 
 #### Add to Cart
+
 ```http
 POST /api/cart
 Authorization: Bearer {token}
@@ -63,6 +67,7 @@ Content-Type: application/json
 ```
 
 #### Update Cart Item
+
 ```http
 PUT /api/cart/:listingId
 Authorization: Bearer {token}
@@ -74,12 +79,14 @@ Content-Type: application/json
 ```
 
 #### Remove from Cart
+
 ```http
 DELETE /api/cart/:listingId
 Authorization: Bearer {token}
 ```
 
 #### Clear Cart
+
 ```http
 DELETE /api/cart
 Authorization: Bearer {token}
@@ -100,16 +107,19 @@ Authorization: Bearer {token}
 ### Order Confirmation Workflow
 
 1. **Buyer places order** → Order status: `pending`
+
    - Listings marked as `pending`
    - Buyer receives confirmation email
    - Sellers receive order notification emails
    - Cart is cleared
 
 2. **Seller confirms order** → Seller confirmation: `true`
+
    - Buyer receives notification
    - Email sent to buyer for delivery confirmation
 
 3. **Buyer confirms delivery** → Buyer confirmation: `true`
+
    - Order status changes to `delivered`
    - Listings marked as `sold`
 
@@ -121,6 +131,7 @@ Authorization: Bearer {token}
 ### API Endpoints
 
 #### Create Order from Cart
+
 ```http
 POST /api/orders
 Authorization: Bearer {token}
@@ -138,6 +149,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -165,45 +177,53 @@ Content-Type: application/json
 ```
 
 #### Get My Orders (as Buyer)
+
 ```http
 GET /api/orders/my-orders?status=pending&page=1&limit=10
 Authorization: Bearer {token}
 ```
 
 #### Get Selling Orders (as Seller)
+
 ```http
 GET /api/orders/selling?status=pending&page=1&limit=10
 Authorization: Bearer {token}
 ```
 
 #### Get Order Details
+
 ```http
 GET /api/orders/:id
 Authorization: Bearer {token}
 ```
 
 #### Confirm Order Delivery
+
 ```http
 PUT /api/orders/:id/confirm
 Authorization: Bearer {token}
 ```
 
 **Usage:**
+
 - **Seller calls this first** → Sets `sellerConfirmed: true`, sends email to buyer
 - **Buyer calls this after** → Sets `buyerConfirmed: true`, order status → `delivered`
 
 #### Complete Order
+
 ```http
 PUT /api/orders/:id/complete
 Authorization: Bearer {token}
 ```
 
 **Requirements:**
+
 - Order must be in `delivered` status
 - Only buyer or admin can complete
 - Sets status to `completed`, payment to `paid`
 
 #### Cancel Order
+
 ```http
 PUT /api/orders/:id/cancel
 Authorization: Bearer {token}
@@ -215,6 +235,7 @@ Content-Type: application/json
 ```
 
 **Effects:**
+
 - Order status → `cancelled`
 - Listings → `available` again
 - All parties notified
@@ -225,21 +246,22 @@ Content-Type: application/json
 
 ### Notification Types
 
-| Type | Description | Priority |
-|------|-------------|----------|
-| `message` | New chat message received | medium |
-| `order_placed` | New order created | high |
-| `order_confirmed` | Order confirmation by seller/buyer | high |
-| `order_delivered` | Order marked as delivered | high |
-| `order_completed` | Order successfully completed | medium |
-| `order_cancelled` | Order cancelled | high |
-| `listing_sold` | Your listing was sold | medium |
-| `review_received` | New review on your profile | medium |
-| `wishlist_price_drop` | Wishlist item price reduced | low |
-| `admin_announcement` | Admin posted announcement | varies |
-| `report_update` | Status update on your report | medium |
+| Type                  | Description                        | Priority |
+| --------------------- | ---------------------------------- | -------- |
+| `message`             | New chat message received          | medium   |
+| `order_placed`        | New order created                  | high     |
+| `order_confirmed`     | Order confirmation by seller/buyer | high     |
+| `order_delivered`     | Order marked as delivered          | high     |
+| `order_completed`     | Order successfully completed       | medium   |
+| `order_cancelled`     | Order cancelled                    | high     |
+| `listing_sold`        | Your listing was sold              | medium   |
+| `review_received`     | New review on your profile         | medium   |
+| `wishlist_price_drop` | Wishlist item price reduced        | low      |
+| `admin_announcement`  | Admin posted announcement          | varies   |
+| `report_update`       | Status update on your report       | medium   |
 
 ### Features
+
 - Persistent storage in MongoDB
 - Real-time delivery via Socket.io
 - Auto-delete after 30 days (TTL index)
@@ -249,12 +271,14 @@ Content-Type: application/json
 ### API Endpoints
 
 #### Get Notifications
+
 ```http
 GET /api/notifications?page=1&limit=20&unreadOnly=true
 Authorization: Bearer {token}
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -281,24 +305,28 @@ Authorization: Bearer {token}
 ```
 
 #### Get Unread Count
+
 ```http
 GET /api/notifications/unread-count
 Authorization: Bearer {token}
 ```
 
 #### Mark as Read
+
 ```http
 PUT /api/notifications/:id/read
 Authorization: Bearer {token}
 ```
 
 #### Mark All as Read
+
 ```http
 PUT /api/notifications/read-all
 Authorization: Bearer {token}
 ```
 
 #### Delete Notification
+
 ```http
 DELETE /api/notifications/:id
 Authorization: Bearer {token}
@@ -311,11 +339,13 @@ Authorization: Bearer {token}
 ### Setup
 
 1. **Configure Gmail App Password** (recommended):
+
    - Go to Google Account → Security → 2-Step Verification → App passwords
    - Generate app-specific password for "Mail"
    - Copy the 16-character password
 
 2. **Update `.env` file**:
+
 ```env
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
@@ -325,16 +355,17 @@ SMTP_PASS=your_app_password_here
 
 3. **For other providers**:
 
-| Provider | SMTP Host | Port | Secure |
-|----------|-----------|------|--------|
-| Gmail | smtp.gmail.com | 587 | false |
-| Outlook | smtp-mail.outlook.com | 587 | false |
-| Yahoo | smtp.mail.yahoo.com | 587 | false |
-| SendGrid | smtp.sendgrid.net | 587 | false |
+| Provider | SMTP Host             | Port | Secure |
+| -------- | --------------------- | ---- | ------ |
+| Gmail    | smtp.gmail.com        | 587  | false  |
+| Outlook  | smtp-mail.outlook.com | 587  | false  |
+| Yahoo    | smtp.mail.yahoo.com   | 587  | false  |
+| SendGrid | smtp.sendgrid.net     | 587  | false  |
 
 ### Email Templates
 
 #### 1. Order Confirmation (to Buyer)
+
 - **Subject:** `Order Confirmation - {orderNumber}`
 - **Contains:**
   - Order details
@@ -344,6 +375,7 @@ SMTP_PASS=your_app_password_here
   - Link to track order
 
 #### 2. New Order Notification (to Seller)
+
 - **Subject:** `New Order Received - {orderNumber}`
 - **Contains:**
   - Order number
@@ -352,6 +384,7 @@ SMTP_PASS=your_app_password_here
   - Link to view order
 
 #### 3. Delivery Confirmation Request
+
 - **Subject:** `Confirm Order Delivery - {orderNumber}`
 - **Contains:**
   - Order details
@@ -359,6 +392,7 @@ SMTP_PASS=your_app_password_here
   - Delivery status
 
 #### 4. Order Completed
+
 - **Subject:** `Order Completed - {orderNumber}`
 - **Contains:**
   - Completion confirmation
@@ -366,12 +400,14 @@ SMTP_PASS=your_app_password_here
   - Link to leave a review
 
 #### 5. Email Verification (Future)
+
 - **Subject:** `Verify Your Email - Thapar Marketplace`
 - **Contains:**
   - Welcome message
   - Verification link (24h expiry)
 
 #### 6. Password Reset (Future)
+
 - **Subject:** `Password Reset Request - Thapar Marketplace`
 - **Contains:**
   - Reset link (1h expiry)
@@ -383,14 +419,14 @@ Located in `server/utils/emailService.js`:
 
 ```javascript
 // Import in your controller
-const { 
+const {
   sendOrderConfirmationEmail,
   sendNewOrderNotificationToSeller,
   sendDeliveryConfirmationRequest,
   sendOrderCompletedEmail,
   sendVerificationEmail,
-  sendPasswordResetEmail
-} = require('../utils/emailService');
+  sendPasswordResetEmail,
+} = require("../utils/emailService");
 
 // Usage example
 await sendOrderConfirmationEmail(order, buyer);
@@ -406,17 +442,17 @@ Use **Ethereal Email** for development:
 const testAccount = await nodemailer.createTestAccount();
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.ethereal.email',
+  host: "smtp.ethereal.email",
   port: 587,
   secure: false,
   auth: {
     user: testAccount.user,
-    pass: testAccount.pass
-  }
+    pass: testAccount.pass,
+  },
 });
 
 // Preview URL will be logged to console
-console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
 ```
 
 ---
@@ -424,6 +460,7 @@ console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
 ## 📊 **DATABASE MODELS**
 
 ### Cart Model
+
 ```javascript
 {
   userId: ObjectId (ref: User, unique),
@@ -440,6 +477,7 @@ console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
 ```
 
 ### Order Model
+
 ```javascript
 {
   orderNumber: String (auto-generated, unique),
@@ -484,6 +522,7 @@ console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
 ```
 
 ### Notification Model
+
 ```javascript
 {
   userId: ObjectId (ref: User, indexed),
@@ -504,17 +543,20 @@ console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
 ## 🔄 **INTEGRATION WITH EXISTING SYSTEMS**
 
 ### Socket.io Integration
+
 - Real-time notification delivery alongside messages
 - Persistent notifications stored even if user offline
 - Chat messages now create notification records
 
 ### Listing Status Updates
+
 - Cart creation: Listings remain `available`
 - Order creation: Listings → `pending`
 - Order delivery confirmed: Listings → `sold`
 - Order cancelled: Listings → `available` again
 
 ### User Notifications
+
 - Buyers: Order confirmations, delivery updates, completion
 - Sellers: New orders, buyer confirmations, payments
 - Both: Cancellations, disputes, reviews
@@ -524,6 +566,7 @@ console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
 ## 🚀 **DEPLOYMENT CHECKLIST**
 
 ### Backend (Render)
+
 1. ✅ Install nodemailer: `npm install nodemailer`
 2. ✅ Add environment variables in Render dashboard:
    - `SMTP_HOST`
@@ -534,6 +577,7 @@ console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
 4. ✅ Test SMTP connection (check logs for "SMTP Server ready")
 
 ### Testing
+
 ```bash
 # Test cart endpoints
 curl -X POST http://localhost:3000/api/cart \
@@ -608,12 +652,12 @@ Edit templates in `server/utils/emailService.js`:
 const mailOptions = {
   from: `"Thapar Marketplace" <${process.env.SMTP_USER}>`,
   to: user.email,
-  subject: 'Your Subject',
+  subject: "Your Subject",
   html: `
     <div style="font-family: Arial; max-width: 600px;">
       <!-- Your custom HTML here -->
     </div>
-  `
+  `,
 };
 ```
 
@@ -621,13 +665,15 @@ const mailOptions = {
 
 ```javascript
 // High priority notifications (immediate attention)
-- order_placed, order_confirmed, order_cancelled
-
-// Medium priority (informational)
-- order_completed, message, review_received
-
-// Low priority (can wait)
-- wishlist_price_drop
+-order_placed,
+  order_confirmed,
+  order_cancelled -
+    // Medium priority (informational)
+    order_completed,
+  message,
+  review_received -
+    // Low priority (can wait)
+    wishlist_price_drop;
 ```
 
 ---
@@ -637,27 +683,30 @@ const mailOptions = {
 ### SMTP Not Working
 
 1. **Check logs:**
+
 ```bash
 # Should see: "✅ SMTP Server ready to send emails"
 # If error, check credentials
 ```
 
 2. **Gmail issues:**
+
    - Enable 2-Step Verification
    - Use App Password (not regular password)
    - Allow less secure apps (not recommended)
 
 3. **Test connection:**
+
 ```javascript
 // Run in Node.js
-const nodemailer = require('nodemailer');
+const nodemailer = require("nodemailer");
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
+  host: "smtp.gmail.com",
   port: 587,
-  auth: { user: 'your@gmail.com', pass: 'app_password' }
+  auth: { user: "your@gmail.com", pass: "app_password" },
 });
 transporter.verify((error, success) => {
-  console.log(error || 'Ready to send emails!');
+  console.log(error || "Ready to send emails!");
 });
 ```
 

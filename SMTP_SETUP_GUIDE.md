@@ -27,7 +27,8 @@ SMTP_USER=your_actual_email@gmail.com
 SMTP_PASS=your_16_char_app_password_here
 ```
 
-**Important:** 
+**Important:**
+
 - Replace `your_actual_email@gmail.com` with your Gmail address
 - Replace `your_16_char_app_password_here` with the app password (no spaces!)
 
@@ -41,6 +42,7 @@ node test-smtp.js
 ```
 
 **Expected Output:**
+
 ```
 🔍 Testing SMTP Configuration...
 SMTP Host: smtp.gmail.com
@@ -65,6 +67,7 @@ Message ID: <random_id@gmail.com>
 ### Step 4: Check Your Inbox
 
 You should receive a test email with:
+
 - Subject: "✅ SMTP Test - Thapar Marketplace"
 - Beautiful HTML formatting
 - Confirmation that SMTP is working
@@ -76,6 +79,7 @@ You should receive a test email with:
 ### Error: "Invalid login"
 
 **Solution:**
+
 1. Make sure you're using **App Password**, NOT your regular Gmail password
 2. Check for spaces in the password (remove them)
 3. Regenerate the app password if needed
@@ -83,6 +87,7 @@ You should receive a test email with:
 ### Error: "Connection timeout"
 
 **Solution:**
+
 1. Check your internet connection
 2. Some networks block SMTP ports (try different network)
 3. Try using port 465 with `secure: true`
@@ -92,21 +97,23 @@ SMTP_PORT=465
 ```
 
 Update `server/utils/emailService.js`:
+
 ```javascript
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  host: process.env.SMTP_HOST || "smtp.gmail.com",
   port: process.env.SMTP_PORT || 465,
   secure: true, // true for 465
   auth: {
     user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
-  }
+    pass: process.env.SMTP_PASS,
+  },
 });
 ```
 
 ### Error: "Authentication failed"
 
 **Solution:**
+
 1. Enable "Less secure app access" (not recommended)
    - Visit: https://myaccount.google.com/lesssecureapps
 2. Better: Use App Passwords (recommended above)
@@ -114,6 +121,7 @@ const transporter = nodemailer.createTransport({
 ### Test Email Not Received
 
 **Check:**
+
 1. Spam/Junk folder
 2. Gmail's "All Mail" folder
 3. Wait 1-2 minutes (can be delayed)
@@ -169,31 +177,37 @@ SMTP_PASS=your_mailgun_password
 Once SMTP is configured, these emails will be sent automatically:
 
 ### 1. Order Confirmation (Buyer)
+
 **When:** Order placed  
 **To:** Buyer  
 **Contains:** Order details, items, total, tracking link
 
 ### 2. New Order Notification (Seller)
+
 **When:** Order placed  
 **To:** Seller(s)  
 **Contains:** Order number, items sold, buyer info
 
 ### 3. Delivery Confirmation Request
+
 **When:** Seller confirms delivery  
 **To:** Buyer  
 **Contains:** Confirmation button, order details
 
 ### 4. Order Completed
+
 **When:** Buyer completes order  
 **To:** Buyer & Seller  
 **Contains:** Completion confirmation, review link
 
 ### 5. Email Verification (Ready for future use)
+
 **When:** New user registers  
 **To:** User  
 **Contains:** Verification link (24h expiry)
 
 ### 6. Password Reset (Ready for future use)
+
 **When:** User requests reset  
 **To:** User  
 **Contains:** Reset link (1h expiry)
@@ -210,11 +224,11 @@ Once SMTP is configured, these emails will be sent automatically:
 
 Add these variables:
 
-| Key | Value |
-|-----|-------|
-| `SMTP_HOST` | `smtp.gmail.com` |
-| `SMTP_PORT` | `587` |
-| `SMTP_USER` | Your Gmail address |
+| Key         | Value                     |
+| ----------- | ------------------------- |
+| `SMTP_HOST` | `smtp.gmail.com`          |
+| `SMTP_PORT` | `587`                     |
+| `SMTP_USER` | Your Gmail address        |
 | `SMTP_PASS` | Your 16-char app password |
 
 4. Click **Save Changes**
@@ -223,6 +237,7 @@ Add these variables:
 ### Verify on Render
 
 Check the logs for:
+
 ```
 ✅ SMTP Server ready to send emails
 ```
@@ -238,17 +253,17 @@ Check the logs for:
 const testAccount = await nodemailer.createTestAccount();
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.ethereal.email',
+  host: "smtp.ethereal.email",
   port: 587,
   secure: false,
   auth: {
     user: testAccount.user,
-    pass: testAccount.pass
-  }
+    pass: testAccount.pass,
+  },
 });
 
 // After sending
-console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
 ```
 
 Click the preview URL to see the email without actually sending it.
@@ -264,6 +279,7 @@ mailhog
 ```
 
 Update `.env` for development:
+
 ```env
 SMTP_HOST=localhost
 SMTP_PORT=1025
@@ -278,15 +294,18 @@ View emails at: http://localhost:8025
 ## 📊 Email Usage Limits
 
 ### Gmail
+
 - **Free:** 500 emails/day
 - **Workspace:** 2,000 emails/day
 
 ### SendGrid (Recommended for Production)
+
 - **Free:** 100 emails/day
 - **Essentials ($19.95/mo):** 50,000 emails/month
 - **Pro ($89.95/mo):** 100,000 emails/month
 
 ### Mailgun
+
 - **Free:** 5,000 emails/month (first 3 months)
 - **Pay as you go:** $0.80 per 1,000 emails
 
@@ -308,9 +327,9 @@ exports.sendOrderConfirmationEmail = async (order, buyer) => {
         <h2 style="color: #2563eb;">Custom Header</h2>
         <!-- Add your branding, logos, colors -->
       </div>
-    `
+    `,
   };
-  
+
   await transporter.sendMail(mailOptions);
 };
 ```
@@ -336,16 +355,16 @@ Add this to your email service:
 
 ```javascript
 const info = await transporter.sendMail(mailOptions);
-console.log('Message sent: %s', info.messageId);
-console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+console.log("Message sent: %s", info.messageId);
+console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
 
 // Save to database
 await EmailLog.create({
   to: buyer.email,
   subject: mailOptions.subject,
   messageId: info.messageId,
-  status: 'sent',
-  sentAt: new Date()
+  status: "sent",
+  sentAt: new Date(),
 });
 ```
 
@@ -358,9 +377,9 @@ const emailLogSchema = new mongoose.Schema({
   subject: String,
   type: String, // order_confirmation, delivery_request, etc.
   messageId: String,
-  status: { type: String, enum: ['sent', 'failed', 'bounced'] },
+  status: { type: String, enum: ["sent", "failed", "bounced"] },
   error: String,
-  sentAt: Date
+  sentAt: Date,
 });
 ```
 

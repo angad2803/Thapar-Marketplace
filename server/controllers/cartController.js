@@ -1,5 +1,5 @@
-const Cart = require('../models/Cart');
-const Listing = require('../models/Listing');
+const Cart = require("../models/Cart");
+const Listing = require("../models/Listing");
 
 /**
  * @desc    Get user's cart
@@ -8,23 +8,22 @@ const Listing = require('../models/Listing');
  */
 exports.getCart = async (req, res, next) => {
   try {
-    let cart = await Cart.findOne({ userId: req.user.id })
-      .populate({
-        path: 'items.listingId',
-        select: 'title price images status sellerId category',
-        populate: {
-          path: 'sellerId',
-          select: 'name email hostel'
-        }
-      });
+    let cart = await Cart.findOne({ userId: req.user.id }).populate({
+      path: "items.listingId",
+      select: "title price images status sellerId category",
+      populate: {
+        path: "sellerId",
+        select: "name email hostel",
+      },
+    });
 
     if (!cart) {
       cart = await Cart.create({ userId: req.user.id, items: [] });
     }
 
     // Filter out unavailable listings
-    const validItems = cart.items.filter(item => 
-      item.listingId && item.listingId.status === 'available'
+    const validItems = cart.items.filter(
+      (item) => item.listingId && item.listingId.status === "available"
     );
 
     if (validItems.length !== cart.items.length) {
@@ -34,7 +33,7 @@ exports.getCart = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      data: cart
+      data: cart,
     });
   } catch (error) {
     next(error);
@@ -55,14 +54,14 @@ exports.addToCart = async (req, res, next) => {
     if (!listing) {
       return res.status(404).json({
         success: false,
-        message: 'Listing not found'
+        message: "Listing not found",
       });
     }
 
-    if (listing.status !== 'available') {
+    if (listing.status !== "available") {
       return res.status(400).json({
         success: false,
-        message: 'This listing is not available'
+        message: "This listing is not available",
       });
     }
 
@@ -70,19 +69,19 @@ exports.addToCart = async (req, res, next) => {
     if (listing.sellerId.toString() === req.user.id) {
       return res.status(400).json({
         success: false,
-        message: 'Cannot add your own listing to cart'
+        message: "Cannot add your own listing to cart",
       });
     }
 
     let cart = await Cart.findOne({ userId: req.user.id });
-    
+
     if (!cart) {
       cart = await Cart.create({ userId: req.user.id, items: [] });
     }
 
     // Check if item already in cart
     const existingItemIndex = cart.items.findIndex(
-      item => item.listingId.toString() === listingId
+      (item) => item.listingId.toString() === listingId
     );
 
     if (existingItemIndex > -1) {
@@ -93,24 +92,24 @@ exports.addToCart = async (req, res, next) => {
       cart.items.push({
         listingId,
         quantity,
-        price: listing.price
+        price: listing.price,
       });
     }
 
     await cart.save();
     await cart.populate({
-      path: 'items.listingId',
-      select: 'title price images status sellerId',
+      path: "items.listingId",
+      select: "title price images status sellerId",
       populate: {
-        path: 'sellerId',
-        select: 'name email hostel'
-      }
+        path: "sellerId",
+        select: "name email hostel",
+      },
     });
 
     res.status(200).json({
       success: true,
-      message: 'Item added to cart',
-      data: cart
+      message: "Item added to cart",
+      data: cart,
     });
   } catch (error) {
     next(error);
@@ -130,45 +129,45 @@ exports.updateCartItem = async (req, res, next) => {
     if (quantity < 1) {
       return res.status(400).json({
         success: false,
-        message: 'Quantity must be at least 1'
+        message: "Quantity must be at least 1",
       });
     }
 
     const cart = await Cart.findOne({ userId: req.user.id });
-    
+
     if (!cart) {
       return res.status(404).json({
         success: false,
-        message: 'Cart not found'
+        message: "Cart not found",
       });
     }
 
     const itemIndex = cart.items.findIndex(
-      item => item.listingId.toString() === listingId
+      (item) => item.listingId.toString() === listingId
     );
 
     if (itemIndex === -1) {
       return res.status(404).json({
         success: false,
-        message: 'Item not found in cart'
+        message: "Item not found in cart",
       });
     }
 
     cart.items[itemIndex].quantity = quantity;
     await cart.save();
     await cart.populate({
-      path: 'items.listingId',
-      select: 'title price images status sellerId',
+      path: "items.listingId",
+      select: "title price images status sellerId",
       populate: {
-        path: 'sellerId',
-        select: 'name email hostel'
-      }
+        path: "sellerId",
+        select: "name email hostel",
+      },
     });
 
     res.status(200).json({
       success: true,
-      message: 'Cart updated',
-      data: cart
+      message: "Cart updated",
+      data: cart,
     });
   } catch (error) {
     next(error);
@@ -185,32 +184,32 @@ exports.removeFromCart = async (req, res, next) => {
     const { listingId } = req.params;
 
     const cart = await Cart.findOne({ userId: req.user.id });
-    
+
     if (!cart) {
       return res.status(404).json({
         success: false,
-        message: 'Cart not found'
+        message: "Cart not found",
       });
     }
 
     cart.items = cart.items.filter(
-      item => item.listingId.toString() !== listingId
+      (item) => item.listingId.toString() !== listingId
     );
 
     await cart.save();
     await cart.populate({
-      path: 'items.listingId',
-      select: 'title price images status sellerId',
+      path: "items.listingId",
+      select: "title price images status sellerId",
       populate: {
-        path: 'sellerId',
-        select: 'name email hostel'
-      }
+        path: "sellerId",
+        select: "name email hostel",
+      },
     });
 
     res.status(200).json({
       success: true,
-      message: 'Item removed from cart',
-      data: cart
+      message: "Item removed from cart",
+      data: cart,
     });
   } catch (error) {
     next(error);
@@ -225,11 +224,11 @@ exports.removeFromCart = async (req, res, next) => {
 exports.clearCart = async (req, res, next) => {
   try {
     const cart = await Cart.findOne({ userId: req.user.id });
-    
+
     if (!cart) {
       return res.status(404).json({
         success: false,
-        message: 'Cart not found'
+        message: "Cart not found",
       });
     }
 
@@ -238,8 +237,8 @@ exports.clearCart = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: 'Cart cleared',
-      data: cart
+      message: "Cart cleared",
+      data: cart,
     });
   } catch (error) {
     next(error);

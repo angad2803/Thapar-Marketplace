@@ -92,12 +92,12 @@ const initializeChatSocket = (io) => {
         // Create persistent notification
         await Notification.create({
           userId: receiverId,
-          type: 'message',
-          title: 'New Message',
+          type: "message",
+          title: "New Message",
           message: `${socket.user.name} sent you a message`,
           relatedId: message._id,
-          relatedModel: 'Message',
-          priority: 'medium'
+          relatedModel: "Message",
+          priority: "medium",
         });
 
         // Send real-time notification to receiver

@@ -1,22 +1,22 @@
-const nodemailer = require('nodemailer');
+const nodemailer = require("nodemailer");
 
 // Create transporter
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  host: process.env.SMTP_HOST || "smtp.gmail.com",
   port: process.env.SMTP_PORT || 587,
   secure: false, // true for 465, false for other ports
   auth: {
     user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
-  }
+    pass: process.env.SMTP_PASS,
+  },
 });
 
 // Verify connection
 transporter.verify((error, success) => {
   if (error) {
-    console.error('SMTP Connection Error:', error);
+    console.error("SMTP Connection Error:", error);
   } else {
-    console.log('✅ SMTP Server ready to send emails');
+    console.log("✅ SMTP Server ready to send emails");
   }
 });
 
@@ -25,9 +25,9 @@ transporter.verify((error, success) => {
  */
 exports.sendOrderConfirmationEmail = async (order, buyer) => {
   try {
-    const itemsList = order.items.map(item => 
-      `- ${item.title} (₹${item.price} x ${item.quantity})`
-    ).join('\n');
+    const itemsList = order.items
+      .map((item) => `- ${item.title} (₹${item.price} x ${item.quantity})`)
+      .join("\n");
 
     const mailOptions = {
       from: `"Thapar Marketplace" <${process.env.SMTP_USER}>`,
@@ -55,13 +55,13 @@ exports.sendOrderConfirmationEmail = async (order, buyer) => {
             Thank you for using Thapar Marketplace!
           </p>
         </div>
-      `
+      `,
     };
 
     await transporter.sendMail(mailOptions);
     console.log(`✅ Order confirmation email sent to ${buyer.email}`);
   } catch (error) {
-    console.error('Error sending order confirmation email:', error);
+    console.error("Error sending order confirmation email:", error);
   }
 };
 
@@ -70,9 +70,9 @@ exports.sendOrderConfirmationEmail = async (order, buyer) => {
  */
 exports.sendNewOrderNotificationToSeller = async (order, seller, items) => {
   try {
-    const itemsList = items.map(item => 
-      `- ${item.title} (₹${item.price} x ${item.quantity})`
-    ).join('\n');
+    const itemsList = items
+      .map((item) => `- ${item.title} (₹${item.price} x ${item.quantity})`)
+      .join("\n");
 
     const mailOptions = {
       from: `"Thapar Marketplace" <${process.env.SMTP_USER}>`,
@@ -98,13 +98,13 @@ exports.sendNewOrderNotificationToSeller = async (order, seller, items) => {
             Thank you for selling on Thapar Marketplace!
           </p>
         </div>
-      `
+      `,
     };
 
     await transporter.sendMail(mailOptions);
     console.log(`✅ New order notification sent to seller ${seller.email}`);
   } catch (error) {
-    console.error('Error sending seller notification:', error);
+    console.error("Error sending seller notification:", error);
   }
 };
 
@@ -121,8 +121,12 @@ exports.sendDeliveryConfirmationRequest = async (order, user, role) => {
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #2563eb;">Confirm Order Delivery</h2>
           <p>Hi ${user.name},</p>
-          <p>The ${role === 'buyer' ? 'seller has marked' : 'buyer has marked'} order ${order.orderNumber} as delivered.</p>
-          <p>Please confirm that you have ${role === 'buyer' ? 'received' : 'delivered'} the items.</p>
+          <p>The ${
+            role === "buyer" ? "seller has marked" : "buyer has marked"
+          } order ${order.orderNumber} as delivered.</p>
+          <p>Please confirm that you have ${
+            role === "buyer" ? "received" : "delivered"
+          } the items.</p>
           
           <div style="text-align: center; margin: 30px 0;">
             <a href="${process.env.FRONTEND_URL}/orders/${order._id}" 
@@ -136,13 +140,13 @@ exports.sendDeliveryConfirmationRequest = async (order, user, role) => {
             Total Amount: ₹${order.totalAmount}
           </p>
         </div>
-      `
+      `,
     };
 
     await transporter.sendMail(mailOptions);
     console.log(`✅ Delivery confirmation request sent to ${user.email}`);
   } catch (error) {
-    console.error('Error sending delivery confirmation:', error);
+    console.error("Error sending delivery confirmation:", error);
   }
 };
 
@@ -164,7 +168,9 @@ exports.sendOrderCompletedEmail = async (order, user) => {
           <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <p><strong>Order Number:</strong> ${order.orderNumber}</p>
             <p><strong>Total Amount:</strong> ₹${order.totalAmount}</p>
-            <p><strong>Completed At:</strong> ${new Date(order.completedAt).toLocaleString()}</p>
+            <p><strong>Completed At:</strong> ${new Date(
+              order.completedAt
+            ).toLocaleString()}</p>
           </div>
           
           <p>Thank you for using Thapar Marketplace. We hope to see you again!</p>
@@ -176,13 +182,13 @@ exports.sendOrderCompletedEmail = async (order, user) => {
             </a>
           </div>
         </div>
-      `
+      `,
     };
 
     await transporter.sendMail(mailOptions);
     console.log(`✅ Order completed email sent to ${user.email}`);
   } catch (error) {
-    console.error('Error sending order completed email:', error);
+    console.error("Error sending order completed email:", error);
   }
 };
 
@@ -192,11 +198,11 @@ exports.sendOrderCompletedEmail = async (order, user) => {
 exports.sendVerificationEmail = async (user, token) => {
   try {
     const verificationUrl = `${process.env.FRONTEND_URL}/verify-email/${token}`;
-    
+
     const mailOptions = {
       from: `"Thapar Marketplace" <${process.env.SMTP_USER}>`,
       to: user.email,
-      subject: 'Verify Your Email - Thapar Marketplace',
+      subject: "Verify Your Email - Thapar Marketplace",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #2563eb;">Welcome to Thapar Marketplace!</h2>
@@ -219,13 +225,13 @@ exports.sendVerificationEmail = async (user, token) => {
             This link will expire in 24 hours.
           </p>
         </div>
-      `
+      `,
     };
 
     await transporter.sendMail(mailOptions);
     console.log(`✅ Verification email sent to ${user.email}`);
   } catch (error) {
-    console.error('Error sending verification email:', error);
+    console.error("Error sending verification email:", error);
   }
 };
 
@@ -235,11 +241,11 @@ exports.sendVerificationEmail = async (user, token) => {
 exports.sendPasswordResetEmail = async (user, resetToken) => {
   try {
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
-    
+
     const mailOptions = {
       from: `"Thapar Marketplace" <${process.env.SMTP_USER}>`,
       to: user.email,
-      subject: 'Password Reset Request - Thapar Marketplace',
+      subject: "Password Reset Request - Thapar Marketplace",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #2563eb;">Password Reset Request</h2>
@@ -258,13 +264,13 @@ exports.sendPasswordResetEmail = async (user, resetToken) => {
             This link will expire in 1 hour.
           </p>
         </div>
-      `
+      `,
     };
 
     await transporter.sendMail(mailOptions);
     console.log(`✅ Password reset email sent to ${user.email}`);
   } catch (error) {
-    console.error('Error sending password reset email:', error);
+    console.error("Error sending password reset email:", error);
   }
 };
 
