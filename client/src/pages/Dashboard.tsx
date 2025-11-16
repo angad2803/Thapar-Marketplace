@@ -58,12 +58,9 @@ const Dashboard = () => {
       if (myHostelOnly) params.append("myHostelOnly", "true");
       if (searchQuery) params.append("search", searchQuery);
 
-      const response = await fetch(
-        `${API_URL}/listings?${params.toString()}`,
-        {
-          headers: getAuthHeaders(),
-        }
-      );
+      const response = await fetch(`${API_URL}/listings?${params.toString()}`, {
+        headers: getAuthHeaders(),
+      });
 
       const data = await response.json();
       if (data.success) {

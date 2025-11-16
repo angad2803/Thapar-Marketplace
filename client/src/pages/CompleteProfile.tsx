@@ -95,17 +95,14 @@ const CompleteProfile = () => {
 
       console.log("Sending payload:", payload); // Debug log
 
-      const response = await fetch(
-        `${API_URL}/auth/complete-profile`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      const response = await fetch(`${API_URL}/auth/complete-profile`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
       const data = await response.json();
 
