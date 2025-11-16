@@ -44,14 +44,11 @@ const ProductDetails = () => {
   useEffect(() => {
     const loadListing = async () => {
       try {
-        const response = await fetch(
-          `${API_URL}/listings/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
+        const response = await fetch(`${API_URL}/listings/${id}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
 
         const data = await response.json();
 
@@ -74,14 +71,11 @@ const ProductDetails = () => {
   useEffect(() => {
     const checkWishlistStatus = async () => {
       try {
-        const response = await fetch(
-          `${API_URL}/listings/wishlist`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
+        const response = await fetch(`${API_URL}/listings/wishlist`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
 
         const data = await response.json();
         if (data.success) {
@@ -106,15 +100,12 @@ const ProductDetails = () => {
     setWishlistLoading(true);
     try {
       const method = isWishlisted ? "DELETE" : "POST";
-      const response = await fetch(
-        `${API_URL}/listings/${id}/wishlist`,
-        {
-          method,
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/listings/${id}/wishlist`, {
+        method,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
       const data = await response.json();
 

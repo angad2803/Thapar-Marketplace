@@ -49,14 +49,11 @@ const ChatDialog = ({
   const loadMessages = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${API_URL}/chat/${recipientId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/chat/${recipientId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setMessages(data.data);
@@ -191,9 +188,7 @@ const ChatDialog = ({
             <div className="flex-1">
               <DialogTitle>{recipientName}</DialogTitle>
               {productTitle && (
-                <p className="text-sm text-muted-foreground">
-                  {productTitle}
-                </p>
+                <p className="text-sm text-muted-foreground">{productTitle}</p>
               )}
             </div>
           </div>
@@ -222,9 +217,7 @@ const ChatDialog = ({
                           : "bg-muted"
                       }`}
                     >
-                      <p className="text-sm break-words">
-                        {message.content}
-                      </p>
+                      <p className="text-sm break-words">{message.content}</p>
                       <p
                         className={`text-xs mt-1 ${
                           isOwn

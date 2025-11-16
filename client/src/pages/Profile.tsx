@@ -108,14 +108,11 @@ const Profile = () => {
 
   const loadReviews = async () => {
     try {
-      const response = await fetch(
-        `${API_URL}/reviews/my-reviews`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/reviews/my-reviews`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
       const data = await response.json();
       if (data.success) {
@@ -128,14 +125,11 @@ const Profile = () => {
 
   const loadMonthlySales = async () => {
     try {
-      const response = await fetch(
-        `${API_URL}/listings/my-listings`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/listings/my-listings`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
       const data = await response.json();
       if (data.success) {
@@ -163,20 +157,17 @@ const Profile = () => {
     setUpdating(true);
 
     try {
-      const response = await fetch(
-        `${API_URL}/auth/update-profile`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify({
-            phoneNumber: phoneNumber || undefined,
-            upiId: upiId || undefined,
-          }),
-        }
-      );
+      const response = await fetch(`${API_URL}/auth/update-profile`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          phoneNumber: phoneNumber || undefined,
+          upiId: upiId || undefined,
+        }),
+      });
 
       const data = await response.json();
       if (data.success) {

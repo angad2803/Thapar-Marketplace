@@ -157,17 +157,14 @@ const AdminDashboard = () => {
   const toggleUserStatus = async (userId: string, currentStatus: boolean) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${API_URL}/admin/users/${userId}/status`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ isActive: !currentStatus }),
-        }
-      );
+      const response = await fetch(`${API_URL}/admin/users/${userId}/status`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ isActive: !currentStatus }),
+      });
 
       const data = await response.json();
       if (data.success) {
@@ -185,17 +182,14 @@ const AdminDashboard = () => {
   ) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${API_URL}/admin/users/${userId}/badges`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ verified: !currentStatus }),
-        }
-      );
+      const response = await fetch(`${API_URL}/admin/users/${userId}/badges`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ verified: !currentStatus }),
+      });
 
       const data = await response.json();
       if (data.success) {
@@ -212,13 +206,10 @@ const AdminDashboard = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${API_URL}/admin/reviews/${reviewId}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await fetch(`${API_URL}/admin/reviews/${reviewId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       const data = await response.json();
       if (data.success) {
@@ -533,18 +524,15 @@ const AdminDashboard = () => {
                         formData.append("images", file);
                       });
 
-                      const response = await fetch(
-                        `${API_URL}/lost-found`,
-                        {
-                          method: "POST",
-                          headers: {
-                            Authorization: `Bearer ${localStorage.getItem(
-                              "token"
-                            )}`,
-                          },
-                          body: formData,
-                        }
-                      );
+                      const response = await fetch(`${API_URL}/lost-found`, {
+                        method: "POST",
+                        headers: {
+                          Authorization: `Bearer ${localStorage.getItem(
+                            "token"
+                          )}`,
+                        },
+                        body: formData,
+                      });
 
                       const data = await response.json();
 

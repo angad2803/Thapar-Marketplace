@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const Message = require("../models/Message");
+const Notification = require("../models/Notification");
 const User = require("../models/User");
 
 // Store active users
@@ -88,7 +89,18 @@ const initializeChatSocket = (io) => {
         // Send message to receiver (if online)
         io.to(receiverId).emit("message:new", populatedMessage);
 
-        // Send notification to receiver
+        // Create persistent notification
+        await Notification.create({
+          userId: receiverId,
+          type: 'message',
+          title: 'New Message',
+          message: `${socket.user.name} sent you a message`,
+          relatedId: message._id,
+          relatedModel: 'Message',
+          priority: 'medium'
+        });
+
+        // Send real-time notification to receiver
         io.to(receiverId).emit("notification:new", {
           type: "message",
           message: `New message from ${socket.user.name}`,

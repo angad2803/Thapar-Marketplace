@@ -44,14 +44,11 @@ const MyListings = () => {
 
   const loadMyListings = async () => {
     try {
-      const response = await fetch(
-        `${API_URL}/listings/my-listings`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/listings/my-listings`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
       const data = await response.json();
       if (data.success) {
@@ -71,15 +68,12 @@ const MyListings = () => {
 
     setDeleting(true);
     try {
-      const response = await fetch(
-        `${API_URL}/listings/${selectedListing}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/listings/${selectedListing}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
       const data = await response.json();
       if (data.success) {

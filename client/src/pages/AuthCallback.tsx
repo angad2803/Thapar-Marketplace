@@ -11,7 +11,7 @@ const AuthCallback = () => {
     if (token) {
       // Store token in localStorage
       localStorage.setItem("token", token);
-      
+
       // Redirect to dashboard
       navigate("/dashboard");
     } else {

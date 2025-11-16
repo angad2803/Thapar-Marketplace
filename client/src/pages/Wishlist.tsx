@@ -36,14 +36,11 @@ const Wishlist = () => {
 
   const loadWishlist = async () => {
     try {
-      const response = await fetch(
-        `${API_URL}/listings/wishlist`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/listings/wishlist`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
       const data = await response.json();
       if (data.success) {

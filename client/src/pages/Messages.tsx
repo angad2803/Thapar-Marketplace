@@ -37,14 +37,11 @@ const Messages = () => {
   const loadConversations = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${API_URL}/chat/conversations`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/chat/conversations`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setConversations(data.data);

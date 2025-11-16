@@ -67,17 +67,14 @@ const EncryptionSetup = ({ onComplete }: EncryptionSetupProps) => {
 
       // Send public key to server
       const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${API_URL}/auth/public-key`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ publicKey }),
-        }
-      );
+      const response = await fetch(`${API_URL}/auth/public-key`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ publicKey }),
+      });
 
       const data = await response.json();
 
