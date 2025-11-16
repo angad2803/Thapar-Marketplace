@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { ShoppingBag } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { API_URL, getAuthHeaders } from "@/config/api";
 
 const CompleteProfile = () => {
   const [searchParams] = useSearchParams();
@@ -95,7 +96,7 @@ const CompleteProfile = () => {
       console.log("Sending payload:", payload); // Debug log
 
       const response = await fetch(
-        "http://localhost:3000/api/auth/complete-profile",
+        `${API_URL}/auth/complete-profile`,
         {
           method: "PUT",
           headers: {

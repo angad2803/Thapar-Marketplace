@@ -8,6 +8,7 @@ import {
   SearchX,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { API_URL, getAuthHeaders } from "@/config/api";
 
 const Navbar = () => {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -18,7 +19,7 @@ const Navbar = () => {
         const token = localStorage.getItem("token");
         if (!token) return;
 
-        const response = await fetch("http://localhost:3000/api/auth/me", {
+        const response = await fetch(`${API_URL}/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await response.json();

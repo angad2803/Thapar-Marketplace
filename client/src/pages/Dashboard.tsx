@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
 import { Search, Plus, Heart, Package, Home } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import { API_URL, getAuthHeaders } from "@/config/api";
 
 const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -33,8 +34,8 @@ const Dashboard = () => {
   const fetchCurrentUser = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:3000/api/auth/me", {
-        headers: { Authorization: `Bearer ${token}` },
+      const response = await fetch(`${API_URL}/auth/me`, {
+        headers: getAuthHeaders(),
       });
       const data = await response.json();
       if (data.success) {
@@ -58,11 +59,9 @@ const Dashboard = () => {
       if (searchQuery) params.append("search", searchQuery);
 
       const response = await fetch(
-        `http://localhost:3000/api/listings?${params.toString()}`,
+        `${API_URL}/listings?${params.toString()}`,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: getAuthHeaders(),
         }
       );
 

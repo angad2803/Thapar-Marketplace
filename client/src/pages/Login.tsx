@@ -8,10 +8,11 @@ import {
 } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { ShoppingBag } from "lucide-react";
+import { API_URL } from "@/config/api";
 
 const Login = () => {
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:3000/api/auth/google";
+    window.location.href = `${API_URL}/auth/google`;
   };
 
   return (

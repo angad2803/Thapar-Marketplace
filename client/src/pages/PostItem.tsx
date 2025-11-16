@@ -21,6 +21,7 @@ import {
 import { Upload, X, ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
+import { API_URL, getAuthHeaders } from "@/config/api";
 
 const PostItem = () => {
   const navigate = useNavigate();
@@ -138,7 +139,7 @@ const PostItem = () => {
       });
 
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:3000/api/listings", {
+      const response = await fetch(`${API_URL}/listings`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

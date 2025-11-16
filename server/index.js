@@ -68,6 +68,99 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "ok", message: "Server is running" });
 });
 
+// Root endpoint - API documentation
+app.get("/", (req, res) => {
+  res.json({
+    message: "HostelKart API",
+    version: "1.0.0",
+    status: "running",
+    endpoints: {
+      health: "/api/health",
+      auth: {
+        base: "/api/auth",
+        routes: [
+          "POST /register",
+          "POST /login",
+          "GET /me",
+          "GET /google",
+          "PUT /update-profile",
+        ],
+      },
+      listings: {
+        base: "/api/listings",
+        routes: [
+          "GET /",
+          "POST /",
+          "GET /:id",
+          "PUT /:id",
+          "DELETE /:id",
+          "GET /my-listings",
+          "GET /wishlist",
+        ],
+      },
+      users: {
+        base: "/api/users",
+        routes: [
+          "GET /:userId/profile",
+          "POST /:userId/follow",
+          "DELETE /:userId/follow",
+          "GET /:userId/listings",
+          "GET /:userId/reviews",
+        ],
+      },
+      chat: {
+        base: "/api/chat",
+        routes: [
+          "GET /conversations",
+          "GET /:recipientId",
+          "POST /:recipientId",
+        ],
+      },
+      reviews: {
+        base: "/api/reviews",
+        routes: [
+          "POST /",
+          "GET /user/:userId",
+          "GET /my-reviews",
+          "PUT /:reviewId",
+          "DELETE /:reviewId",
+        ],
+      },
+      lostFound: {
+        base: "/api/lost-found",
+        routes: [
+          "GET /",
+          "GET /:id",
+          "POST /",
+          "PUT /:id/status",
+          "DELETE /:id",
+        ],
+      },
+      admin: {
+        base: "/api/admin",
+        routes: [
+          "GET /stats",
+          "GET /users",
+          "PUT /users/:userId/status",
+          "PUT /users/:userId/badges",
+          "GET /reviews",
+          "DELETE /reviews/:reviewId",
+        ],
+      },
+    },
+    documentation: "Visit the frontend for full documentation",
+  });
+});
+
+// 404 handler for undefined routes
+app.use((req, res) => {
+  res.status(404).json({
+    error: "Not Found",
+    message: `Route ${req.method} ${req.path} not found`,
+    availableEndpoints: ["/", "/api/health"],
+  });
+});
+
 // Start server with Socket.IO
 server.listen(PORT, () => {
   console.log(`✓ Server running on http://localhost:${PORT}`);
