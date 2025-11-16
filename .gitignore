@@ -44,8 +44,8 @@ server/uploads/*
 !server/uploads/.gitkeep
 
 # Temporary/backup files
-backend/
-src/
+/backend/
+/src/
 
 # Extra documentation
 **/DEVELOPMENT.md
