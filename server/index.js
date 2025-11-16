@@ -22,7 +22,7 @@ const PORT = process.env.PORT || 3000;
 const allowedOrigins = [
   "http://localhost:8080",
   "http://localhost:5173",
-  "https://thapar-marketplace-olxk.vercel.app"
+  "https://thapar-marketplace-olxk.vercel.app",
 ];
 
 const io = new Server(server, {
