@@ -96,6 +96,7 @@ app.use("/api/lost-found", require("./routes/lostFound"));
 app.use("/api/cart", require("./routes/cartRoutes"));
 app.use("/api/orders", require("./routes/orderRoutes"));
 app.use("/api/notifications", require("./routes/notificationRoutes"));
+app.use("/api/admin-logs", require("./routes/adminLogRoutes"));
 
 // Welcome route
 app.get("/", (req, res) => {
