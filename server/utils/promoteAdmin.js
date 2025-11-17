@@ -1,12 +1,19 @@
-require("dotenv").config();
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 const mongoose = require("mongoose");
 const User = require("../models/User");
 
 const promoteToAdmin = async (email) => {
   try {
     // Connect to database
-    const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/ziddi";
-    await mongoose.connect(MONGODB_URI);
+    const MONGODB_URI = process.env.MONGODB_URI;
+    if (!MONGODB_URI) {
+      throw new Error("MONGODB_URI not set in environment variables");
+    }
+    await mongoose.connect(MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
     console.log("✓ MongoDB connected");
 
     // Find and update user

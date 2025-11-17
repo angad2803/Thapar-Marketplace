@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getAuthHeaders } from "@/config/api";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import {
@@ -129,13 +130,13 @@ const AdminDashboard = () => {
 
       const [statsRes, usersRes, reviewsRes] = await Promise.all([
         fetch("http://localhost:3000/api/admin/stats", {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { ...getAuthHeaders() },
         }),
         fetch("http://localhost:3000/api/admin/users?limit=10", {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { ...getAuthHeaders() },
         }),
         fetch("http://localhost:3000/api/admin/reviews?limit=10", {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { ...getAuthHeaders() },
         }),
       ]);
 
@@ -161,8 +162,8 @@ const AdminDashboard = () => {
         {
           method: "PUT",
           headers: {
+            ...getAuthHeaders(),
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ isActive: !currentStatus }),
         }
@@ -189,8 +190,8 @@ const AdminDashboard = () => {
         {
           method: "PUT",
           headers: {
+            ...getAuthHeaders(),
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ verified: !currentStatus }),
         }
@@ -215,7 +216,7 @@ const AdminDashboard = () => {
         `http://localhost:3000/api/admin/reviews/${reviewId}`,
         {
           method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { ...getAuthHeaders() },
         }
       );
 
@@ -357,6 +358,40 @@ const AdminDashboard = () => {
                 >
                   <BarChart3 className="h-4 w-4 mr-2" />
                   Platform Reports
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={async () => {
+                    if (
+                      !window.confirm(
+                        "Are you sure you want to delete ALL listings? This action cannot be undone."
+                      )
+                    )
+                      return;
+                    try {
+                      const response = await fetch(
+                        "http://localhost:3000/api/admin/listings/all",
+                        {
+                          method: "DELETE",
+                          headers: { ...getAuthHeaders() },
+                        }
+                      );
+                      const data = await response.json();
+                      if (data.success) {
+                        toast.success("All listings deleted successfully");
+                        fetchDashboardData();
+                      } else {
+                        toast.error(
+                          data.message || "Failed to delete listings"
+                        );
+                      }
+                    } catch (err) {
+                      toast.error("Failed to delete listings");
+                    }
+                  }}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete All Listings
                 </Button>
               </CardContent>
             </Card>

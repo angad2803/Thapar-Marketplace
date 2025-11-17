@@ -1,3 +1,19 @@
+/**
+ * @desc    Delete all listings (admin)
+ * @route   DELETE /api/admin/listings/all
+ * @access  Private/Admin
+ */
+exports.deleteAllListings = async (req, res, next) => {
+  try {
+    await Listing.deleteMany({});
+    res.status(200).json({
+      success: true,
+      message: "All listings deleted successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 const User = require("../models/User");
 const Listing = require("../models/Listing");
 const Report = require("../models/Report");

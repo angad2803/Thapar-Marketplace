@@ -1,4 +1,6 @@
 const Listing = require("../models/Listing");
+const { sendEmail } = require("../utils/emailService");
+const cloudinary = require("../utils/cloudinary");
 const User = require("../models/User");
 const { calculateProximityScore } = require("../utils/hostelProximity");
 
@@ -149,10 +151,24 @@ exports.createListing = async (req, res, next) => {
       tags,
     } = req.body;
 
-    // Handle image uploads
+    // Handle image uploads with Cloudinary
     let images = [];
     if (req.files && req.files.length > 0) {
-      images = req.files.map((file) => `/uploads/${file.filename}`);
+      for (const file of req.files) {
+        try {
+          const result = await cloudinary.uploader.upload(file.path, {
+            folder: "marketplace/listings",
+            resource_type: "image",
+          });
+          images.push(result.secure_url);
+        } catch (err) {
+          return res.status(500).json({
+            success: false,
+            message: "Image upload failed",
+            error: err.message,
+          });
+        }
+      }
     } else {
       return res.status(400).json({
         success: false,
@@ -177,6 +193,18 @@ exports.createListing = async (req, res, next) => {
       sellerId: req.user.id,
       sellerHostel,
     });
+
+    // Send product added email
+    try {
+      const seller = await User.findById(req.user.id);
+      await sendEmail({
+        to: seller.email,
+        subject: "Your product has been listed!",
+        text: `Hi ${seller.name},\n\nYour product '${title}' has been successfully listed on Thapar Marketplace.`,
+      });
+    } catch (err) {
+      console.error("Failed to send product added email:", err);
+    }
 
     const populatedListing = await Listing.findById(listing._id).populate(
       "sellerId",

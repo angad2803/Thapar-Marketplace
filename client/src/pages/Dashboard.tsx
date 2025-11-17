@@ -33,9 +33,11 @@ const Dashboard = () => {
 
   const fetchCurrentUser = async () => {
     try {
-      const token = localStorage.getItem("token");
       const response = await fetch(`${API_URL}/auth/me`, {
-        headers: getAuthHeaders(),
+        headers: {
+          ...getAuthHeaders(),
+          "Content-Type": "application/json",
+        },
       });
       const data = await response.json();
       if (data.success) {
@@ -59,16 +61,15 @@ const Dashboard = () => {
       if (searchQuery) params.append("search", searchQuery);
 
       const response = await fetch(`${API_URL}/listings?${params.toString()}`, {
-        headers: getAuthHeaders(),
+        headers: {
+          ...getAuthHeaders(),
+          "Content-Type": "application/json",
+        },
       });
 
       const data = await response.json();
       if (data.success) {
-        // Filter out user's own listings
-        const filteredProducts = data.data.filter(
-          (product: any) => product.sellerId._id !== currentUserId
-        );
-        setProducts(filteredProducts);
+        setProducts(data.data);
         if (data.userHostel) setUserHostel(data.userHostel);
       }
     } catch (error) {
@@ -117,12 +118,6 @@ const Dashboard = () => {
             <Link to="/wishlist">
               <Heart className="mr-2 h-4 w-4" />
               Wishlist
-            </Link>
-          </Button>
-          <Button asChild variant="outline">
-            <Link to="/my-listings">
-              <Package className="mr-2 h-4 w-4" />
-              My Listings
             </Link>
           </Button>
         </div>

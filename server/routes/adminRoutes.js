@@ -44,6 +44,11 @@ router.post("/users/bulk-ban", bulkBanUsers);
 router.get("/listings", getAllListings);
 router.delete("/listings/:id", mongoIdValidation, validate, deleteListing);
 router.post("/listings/bulk-delete", bulkDeleteListings);
+// Delete all listings
+router.delete(
+  "/listings/all",
+  require("../controllers/adminController").deleteAllListings
+);
 
 // Review management
 router.get("/reviews", getAllReviews);

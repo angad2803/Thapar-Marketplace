@@ -14,6 +14,20 @@ const AuthCallback = () => {
       // Store token in localStorage
       localStorage.setItem("token", token);
 
+      // Optionally fetch user info and store role
+      fetch("http://localhost:3000/api/auth/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && data.data) {
+            localStorage.setItem("userRole", data.data.role);
+            localStorage.setItem("userId", data.data._id);
+          }
+        });
+
       // Show encryption setup before redirecting
       setShowEncryptionSetup(true);
     } else {

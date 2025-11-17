@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const { sendEmail } = require("../utils/emailService");
 const User = require("../models/User");
 const firebase = require("../config/firebase");
 
@@ -51,6 +52,17 @@ exports.register = async (req, res, next) => {
 
     // Generate token
     const token = generateToken(user._id);
+
+    // Send registration email
+    try {
+      await sendEmail({
+        to: user.email,
+        subject: "Welcome to Thapar Marketplace!",
+        text: `Hi ${user.name},\n\nThank you for registering at Thapar Marketplace. You can now buy and sell items with your campus community!`,
+      });
+    } catch (err) {
+      console.error("Failed to send registration email:", err);
+    }
 
     res.status(201).json({
       success: true,
@@ -243,6 +255,20 @@ exports.googleCallback = async (req, res, next) => {
   try {
     // Generate JWT token
     const token = generateToken(req.user._id);
+
+    // Send welcome email if first login (profileCompleted is false)
+    if (!req.user.profileCompleted) {
+      try {
+        const { sendEmail } = require("../utils/emailService");
+        await sendEmail({
+          to: req.user.email,
+          subject: "Welcome to Thapar Marketplace!",
+          text: `Hi ${req.user.name},\n\nThank you for registering at Thapar Marketplace. You can now buy and sell items with your campus community!`,
+        });
+      } catch (err) {
+        console.error("Failed to send OAuth registration email:", err);
+      }
+    }
 
     // Check if profile is completed
     const profileCompleted = req.user.profileCompleted;
