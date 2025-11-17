@@ -19,9 +19,15 @@ const server = http.createServer(app);
 const PORT = process.env.PORT || 3000;
 
 // Socket.IO setup with CORS
+const allowedOrigins = [
+  "http://localhost:8080",
+  "http://localhost:5173",
+  "https://thapar-marketplace-olxk.vercel.app",
+];
+
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:8080",
+    origin: process.env.FRONTEND_URL || allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -32,7 +38,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:8080",
+    origin: process.env.FRONTEND_URL || allowedOrigins,
     credentials: true,
   })
 );

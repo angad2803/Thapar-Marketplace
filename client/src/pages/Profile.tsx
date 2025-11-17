@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { API_URL } from "@/config/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -84,7 +85,7 @@ const Profile = () => {
 
   const loadProfile = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/auth/me", {
+      const response = await fetch(`${API_URL}/auth/me`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -107,14 +108,11 @@ const Profile = () => {
 
   const loadReviews = async () => {
     try {
-      const response = await fetch(
-        "http://localhost:3000/api/reviews/my-reviews",
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/reviews/my-reviews`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
       const data = await response.json();
       if (data.success) {
@@ -127,14 +125,11 @@ const Profile = () => {
 
   const loadMonthlySales = async () => {
     try {
-      const response = await fetch(
-        "http://localhost:3000/api/listings/my-listings",
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/listings/my-listings`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
       const data = await response.json();
       if (data.success) {
@@ -162,20 +157,17 @@ const Profile = () => {
     setUpdating(true);
 
     try {
-      const response = await fetch(
-        "http://localhost:3000/api/auth/update-profile",
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify({
-            phoneNumber: phoneNumber || undefined,
-            upiId: upiId || undefined,
-          }),
-        }
-      );
+      const response = await fetch(`${API_URL}/auth/update-profile`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          phoneNumber: phoneNumber || undefined,
+          upiId: upiId || undefined,
+        }),
+      });
 
       const data = await response.json();
       if (data.success) {

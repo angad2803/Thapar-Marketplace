@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { API_URL, API_BASE_URL } from "@/config/api";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -43,14 +44,11 @@ const ProductDetails = () => {
   useEffect(() => {
     const loadListing = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:3000/api/listings/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
+        const response = await fetch(`${API_URL}/listings/${id}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
 
         const data = await response.json();
 
@@ -73,14 +71,11 @@ const ProductDetails = () => {
   useEffect(() => {
     const checkWishlistStatus = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:3000/api/listings/wishlist",
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
+        const response = await fetch(`${API_URL}/listings/wishlist`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
 
         const data = await response.json();
         if (data.success) {
@@ -105,15 +100,12 @@ const ProductDetails = () => {
     setWishlistLoading(true);
     try {
       const method = isWishlisted ? "DELETE" : "POST";
-      const response = await fetch(
-        `http://localhost:3000/api/listings/${id}/wishlist`,
-        {
-          method,
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/listings/${id}/wishlist`, {
+        method,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
       const data = await response.json();
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { API_URL, API_BASE_URL } from "@/config/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -43,14 +44,11 @@ const MyListings = () => {
 
   const loadMyListings = async () => {
     try {
-      const response = await fetch(
-        "http://localhost:3000/api/listings/my-listings",
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/listings/my-listings`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
       const data = await response.json();
       if (data.success) {
@@ -70,15 +68,12 @@ const MyListings = () => {
 
     setDeleting(true);
     try {
-      const response = await fetch(
-        `http://localhost:3000/api/listings/${selectedListing}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/listings/${selectedListing}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
       const data = await response.json();
       if (data.success) {
@@ -172,7 +167,7 @@ const MyListings = () => {
                   <div className="aspect-video relative bg-gray-200 dark:bg-gray-800">
                     {listing.images && listing.images.length > 0 ? (
                       <img
-                        src={`http://localhost:3000${listing.images[0]}`}
+                        src={`${API_BASE_URL}${listing.images[0]}`}
                         alt={listing.title}
                         className="w-full h-full object-cover"
                       />

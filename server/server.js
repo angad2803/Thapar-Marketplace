@@ -32,7 +32,9 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     },
   })
@@ -84,10 +86,17 @@ app.get("/api/health", (req, res) => {
 
 // API Routes
 app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/listings", require("./routes/listingRoutes"));
 app.use("/api/chat", require("./routes/chatRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
 app.use("/api/reports", require("./routes/reportRoutes"));
+app.use("/api/reviews", require("./routes/reviewRoutes"));
+app.use("/api/lost-found", require("./routes/lostFound"));
+app.use("/api/cart", require("./routes/cartRoutes"));
+app.use("/api/orders", require("./routes/orderRoutes"));
+app.use("/api/notifications", require("./routes/notificationRoutes"));
+app.use("/api/admin-logs", require("./routes/adminLogRoutes"));
 
 // Welcome route
 app.get("/", (req, res) => {
@@ -98,8 +107,14 @@ app.get("/", (req, res) => {
     documentation: "/api/docs",
     endpoints: {
       auth: "/api/auth",
+      users: "/api/users",
       listings: "/api/listings",
+      cart: "/api/cart",
+      orders: "/api/orders",
       chat: "/api/chat",
+      notifications: "/api/notifications",
+      reviews: "/api/reviews",
+      lostFound: "/api/lost-found",
       admin: "/api/admin",
       reports: "/api/reports",
       health: "/api/health",
